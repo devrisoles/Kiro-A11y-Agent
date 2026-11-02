@@ -1,141 +1,265 @@
-# 🎃 Kiro A11y Agent — Autonomous Web Accessibility Auditor & Auto-Fixer (WCAG 2.2)
+# 🎃 Kiro A11y Agent
 
-> **Submissão Oficial para o Hackathon Kiroween**  
-> **Desenvolvido por kirodev**  
-> *De páginas inacessíveis a código 100% conforme com a WCAG 2.2 em segundos — alimentado por Playwright Headless, Accessibility Tree real, Visão Computacional Multimodal e Spec-Driven Development.*
+### Autonomous Web Accessibility Auditor & Auto-Fixer (WCAG 2.2)
+
+> De páginas inacessíveis a código conforme com a **WCAG 2.2** em segundos — alimentado por **Playwright Headless**, **Accessibility Tree** real, **Visão Computacional Multimodal** e **Spec-Driven Development**.
+
+<p>
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
+  <img alt="Playwright" src="https://img.shields.io/badge/Playwright-Async-2EAD33?logo=playwright&logoColor=white">
+  <img alt="WCAG" src="https://img.shields.io/badge/WCAG-2.2%20A%20%26%20AA-7c3aed">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green">
+  <img alt="Status" src="https://img.shields.io/badge/status-funcional-brightgreen">
+</p>
+
+O **Kiro A11y Agent** é um agente autônomo de ciclo fechado que abre uma página em um navegador real, extrai a *Accessibility Tree* e os estilos computados, analisa o screenshot de forma multimodal e **gera + aplica automaticamente** patches de código (HTML/CSS/JSX), revalidando a página até atingir conformidade.
+
+> **Submissão Oficial para o Hackathon Kiroween** · **Desenvolvido por kirodev**
 
 ---
 
-## 💡 Inspiração e Problema
+## 📑 Índice
 
-De acordo com o estudo **WebAIM Million**, mais de **96% das páginas web** falham em critérios básicos da **WCAG 2.1/2.2**. As ferramentas tradicionais de acessibilidade sofrem de três limitações críticas:
-1. **Validadores estáticos são cegos ao navegador real:** Analisam apenas HTML bruto sem calcular estilos CSS herdados, transparências, estados renderizados via JS ou a **Árvore de Acessibilidade (Accessibility Tree)** real exposta aos leitores de tela (NVDA, VoiceOver, JAWS).
-2. **Validadores tradicionais não enxergam contexto visual:** Eles conseguem dizer se um atributo `alt` existe, mas não sabem detectar se `alt="imagem"` ou `alt="foto"` é inútil nem gerar uma descrição contextual precisa.
-3. **Eles apontam erros, mas não consertam o código:** Desenvolvedores recebem dezenas de alertas técnicos da W3C sem o patch de código pronto para aplicar.
-
-O **Kiro A11y Agent** nasce para resolver isso como um **Agente Autônomo de Ciclo Fechado**: ele abre a página em um navegador real, extrai a Accessibility Tree e estilos computados, analisa o screenshot multimodalmente e **gera + aplica automaticamente os patches de código HTML/CSS/JSX**, revalidando a página até atingir **100/100 de score**.
+- [Por que existe](#-por-que-existe)
+- [Os 4 Pilares de Auditoria](#-os-4-pilares-de-auditoria-wcag-22-a--aa)
+- [Como funciona](#️-como-funciona-pipeline)
+- [Instalação](#-instalação)
+- [Configuração de IA (opcional)](#-configuração-de-ia-opcional)
+- [Uso da CLI](#-uso-da-cli)
+- [Exemplo de resultado](#-exemplo-de-resultado-demo)
+- [Estrutura do projeto](#-estrutura-do-projeto)
+- [Solução de problemas](#-solução-de-problemas)
+- [FAQ](#-faq)
+- [Tecnologias](#-tecnologias)
+- [Contribuindo](#-contribuindo)
+- [Licença](#-licença)
 
 ---
 
-## 🎯 Os 4 Pilares de Auditoria Cirúrgica (Escopo WCAG 2.2 A & AA)
+## 💡 Por que existe
 
-| Pilar | Critérios WCAG 2.1 / 2.2 | Como o Kiro A11y Agent Detecta e Corrige |
+Segundo o estudo **WebAIM Million**, mais de **96% das páginas web** falham em critérios básicos da WCAG. As ferramentas tradicionais sofrem de três limitações:
+
+1. **São cegas ao navegador real** — analisam HTML bruto sem calcular estilos CSS herdados, transparências, estados renderizados por JS ou a *Accessibility Tree* exposta a leitores de tela (NVDA, VoiceOver, JAWS).
+2. **Não enxergam contexto visual** — sabem dizer se um `alt` existe, mas não detectam que `alt="imagem"` é inútil nem geram uma descrição precisa.
+3. **Apontam erros, mas não consertam** — o desenvolvedor recebe uma lista de alertas sem o patch pronto.
+
+O Kiro A11y Agent fecha esse ciclo: **detecta, explica, corrige e revalida**.
+
+---
+
+## 🎯 Os 4 Pilares de Auditoria (WCAG 2.2 A & AA)
+
+| Pilar | Critérios WCAG | Detecção & Correção |
 | :--- | :--- | :--- |
-| **1. Contraste e Visibilidade** | `1.4.3 Contrast (Minimum) (AA)`<br>`1.4.11 Non-text Contrast (AA)` | Coleta `color` e `backgroundColor` computados (resolvendo fundos transparentes na árvore ancestral), calcula a luminância relativa oficial da W3C e sugere/aplica cores hexadecimais com razão $\ge 4.5:1$ (ou $\ge 7.0:1$ AAA). |
-| **2. Elementos Interativos Mudos** | `4.1.2 Name, Role, Value (A)`<br>`2.4.4 Link Purpose (A)`<br>`1.3.1 Info & Relationships (A)` | Identifica `<button>`, `<a>`, `<input>`, `<select>` sem texto visível, `aria-label` ou `<label>` na Accessibility Tree e injeta rótulos semânticos baseados no ícone/contexto. |
-| **3. Semântica de Mídia (Vision)** | `1.1.1 Non-text Content (A)` | Detecta `<img>` e `<svg>` sem `alt`, com `alt=""` indevido em cards/links ou descrições genéricas (`"imagem"`, `"foto"`) e sintetiza descrições visuais contextuais. |
-| **4. Ordem de Foco e Teclado** | `2.4.3 Focus Order (A)`<br>`2.4.7 Focus Visible (AA)`<br>`2.1.1 Keyboard (A)`<br>`2.1.2 No Keyboard Trap (A)` | Corrige `tabindex > 0`, restaura indicadores `:focus-visible` suprimidos por `outline: none`, torna `div[onclick]` acessíveis via teclado (`Enter`/`Space`) e elimina armadilhas de teclado (`Tab`/`Escape` bloqueados). |
+| **1. Contraste e Visibilidade** | `1.4.3 (AA)` · `1.4.11 (AA)` | Coleta `color`/`backgroundColor` computados (resolvendo fundos transparentes na árvore ancestral), calcula a luminância relativa oficial da W3C e aplica cores com razão ≥ 4.5:1 (ou ≥ 7:1 AAA). |
+| **2. Elementos Interativos Mudos** | `4.1.2 (A)` · `2.4.4 (A)` · `1.3.1 (A)` | Identifica `button`, `a`, `input`, `select` sem nome acessível na Accessibility Tree e injeta `aria-label`/`<label>` semânticos a partir do ícone/contexto. |
+| **3. Semântica de Mídia** | `1.1.1 (A)` | Detecta `img`/`svg` sem `alt`, com `alt=""` indevido ou descrições genéricas e sintetiza descrições contextuais. |
+| **4. Ordem de Foco e Teclado** | `2.4.3 (A)` · `2.4.7 (AA)` · `2.1.1 (A)` · `2.1.2 (A)` | Corrige `tabindex > 0`, restaura `:focus-visible` suprimido por `outline: none`, torna `div[onclick]` acessível por teclado e remove *keyboard traps*. |
 
 ---
 
-## 🏗️ Arquitetura Modular e Spec-Driven Development
+## ⚙️ Como funciona (pipeline)
 
-O projeto foi planejado e construído seguindo a metodologia **Spec-Driven Development** do Kiro:
-- 📄 [`requirements.md`](./requirements.md) — Requisitos funcionais no padrão EARS e critérios de aceitação WCAG 2.2.
-- 📐 [`design.md`](./design.md) — Arquitetura de pipeline assíncrono, algoritmos de luminância e schema JSON.
-- ✅ [`tasks.md`](./tasks.md) — Plano de implementação modular e verificação de ponta a ponta.
-
-```text
-Kiro A11y Agent/
-├── .kiro/specs/kiro-a11y-agent/  # Especificações Kiro (requirements.md, design.md, tasks.md)
-├── requirements.md               # Especificação de Requisitos (EARS + WCAG 2.2)
-├── design.md                     # Arquitetura técnica e fluxo multimodal
-├── tasks.md                      # Checklist de engenharia e validação
-├── core/
-│   ├── scanner.py                # Async Playwright + Screenshot B64 + Accessibility Tree + JS DOM Filter
-│   ├── analyzer.py               # Cliente OpenAI SDK (qualquer BASE_URL) + Motor Smart Mock/Fallback
-│   └── fixer.py                  # Gerador de diffs Antes/Depois, Auto-Fixer DOM e Relatório Markdown
-├── cli/
-│   └── main.py                   # Interface CLI interativa com Typer e Rich (scan, fix, demo)
-├── tests/
-│   └── broken_page.html          # Mini E-commerce realista com falhas intencionais nos 4 pilares
-├── reports/
-│   ├── audit_report.md           # Relatório executivo e técnico gerado automaticamente
-│   ├── fixed_page.html           # Página HTML corrigida automaticamente pelo agente (Score 100/100)
-│   └── latest_screenshot.png     # Captura visual de página inteira
-├── .env.example                  # Template de configuração flexível de IA
-├── requirements.txt              # Dependências Python 3.10+
-└── README.md                     # Documentação Devpost
+```mermaid
+flowchart LR
+    CLI["CLI<br/>Typer + Rich"] --> Scanner["Scanner<br/>Async Playwright + JS Injection"]
+    Scanner -->|DOM filtrado + A11y Tree + Screenshot B64| Analyzer["Analyzer<br/>OpenAI SDK ou Smart Mock"]
+    Analyzer -->|Diagnóstico WCAG 2.2 JSON| Fixer["Fixer<br/>Patch Generator + DOM Fixer"]
+    Fixer --> Report["Relatório Markdown"]
+    Fixer --> Patched["HTML corrigido"]
 ```
 
+1. **Scanner** renderiza a página no Chromium headless, captura screenshot full-page, extrai a Accessibility Tree e injeta JS que filtra cirurgicamente só os elementos relevantes aos 4 pilares (economiza >80% de tokens).
+2. **Analyzer** envia os dados a um provedor compatível com OpenAI (Vision) **ou** ativa o **Smart Mock/Fallback** determinístico quando não há chave de API.
+3. **Fixer** gera diffs "Antes/Depois", aplica correções com BeautifulSoup e exporta o relatório Markdown.
+
 ---
 
-## 🚀 Instalação e Execução Rápida
+## 🚀 Instalação
 
-### 1. Pré-requisitos
-- **Python 3.10+**
+### Pré-requisitos
+- **Python 3.10 ou superior**
+- **Git**
 
-### 2. Instalar dependências e navegador Headless
+### Passo a passo
+
 ```bash
-cd "Kiro-A11y-Agent"
+# 1. Clone o repositório
+git clone https://github.com/devrisoles/Kiro-A11y-Agent.git
+cd Kiro-A11y-Agent
+
+# 2. Crie e ative um ambiente virtual
 python -m venv venv
 
-# No Windows (PowerShell):
+# Windows (PowerShell):
 .\venv\Scripts\Activate.ps1
-
-# No Linux/macOS:
+# Linux/macOS:
 # source venv/bin/activate
 
+# 3. Instale as dependências
 pip install -r requirements.txt
+
+# 4. Instale o navegador headless do Playwright
 playwright install chromium
 ```
 
-### 3. Configurar `.env` (Opcional — Possui Modo Smart Mock Automático!)
-Copie `.env.example` para `.env`:
-```bash
-copy .env.example .env
-```
-> **Nota para os Jurados do Kiroween:** Você **não precisa** configurar uma chave de API para testar! Se `AI_API_KEY` estiver em branco, o `analyzer.py` ativa automaticamente o **Modo Smart Mock/Fallback**, analisando o DOM real e a Accessibility Tree extraídos pelo Playwright e gerando todos os patches e relatórios em tempo real.
+> 💡 Se o `playwright install chromium` falhar, o agente faz **fallback automático** para o Google Chrome ou Microsoft Edge já instalados no sistema.
 
 ---
 
-## 💻 Comandos da CLI (`typer` + `rich`)
+## 🔑 Configuração de IA (opcional)
 
-### 1. Rodar a Demonstração Completa do Hackathon (`demo`)
-Executa o ciclo autônomo completo em `tests/broken_page.html`: escaneia a página quebrada, gera `reports/audit_report.md`, cria a página corrigida `reports/fixed_page.html` e **re-audita a página corrigida** comprovando que o score salta para **100/100**:
+O agente funciona **100% sem chave de API** graças ao **Smart Mock/Fallback**, que processa os dados reais extraídos pelo Playwright com heurísticas determinísticas. Para usar IA multimodal (Vision), copie o template e preencha o `.env`:
+
+```bash
+# Windows
+copy .env.example .env
+# Linux/macOS
+cp .env.example .env
+```
+
+```env
+AI_BASE_URL=https://openrouter.ai/api/v1
+AI_API_KEY=sua_chave_aqui
+AI_MODEL_TEXT=openai/gpt-4o-mini
+AI_MODEL_VISION=openai/gpt-4o-mini
+```
+
+Compatível com qualquer endpoint no padrão OpenAI: **OpenRouter**, **OpenAI**, **xAI (Grok)**, **Gemini (OpenAI-compat)** e **Ollama** (`http://localhost:11434/v1`).
+
+> ⚠️ **Nunca** faça commit do seu arquivo `.env`. Ele já está no `.gitignore`.
+
+Detalhes em [`docs/CONFIGURATION.md`](./docs/CONFIGURATION.md).
+
+---
+
+## 💻 Uso da CLI
+
+A ferramenta expõe três comandos. A flag `--mock` força o modo determinístico (sem consumir créditos de API).
+
+### `demo` — ciclo completo de demonstração
+Escaneia `tests/broken_page.html`, gera o relatório, cria a página corrigida e **re-audita** para comprovar a evolução do score.
+
 ```bash
 python -m cli.main demo
+python -m cli.main demo --mock
 ```
 
-### 2. Auditar qualquer URL ou arquivo local (`scan`)
+### `scan` — auditar uma URL ou arquivo local
 ```bash
-# Auditar a página de testes local
 python -m cli.main scan tests/broken_page.html
-
-# Auditar uma URL real na web
 python -m cli.main scan https://example.com
+python -m cli.main scan https://example.com --output meu_relatorio.md
 ```
 
-### 3. Gerar e Aplicar Patches Automaticamente (`fix`)
+### `fix` — gerar e aplicar correções
 ```bash
-# Gera a versão corrigida em reports/fixed_page.html e exibe os diffs Antes/Depois no terminal
+# Gera a versão corrigida em reports/fixed_page.html
 python -m cli.main fix tests/broken_page.html
 
-# Para aplicar diretamente no arquivo original (cria backup .bak automaticamente):
+# Aplica direto no arquivo original (cria backup .bak automaticamente)
 python -m cli.main fix tests/broken_page.html --in-place
 ```
 
+Guia completo em [`docs/USAGE.md`](./docs/USAGE.md).
+
 ---
 
-## 📊 Exemplo de Resultado Real (`demo`)
+## 📊 Exemplo de resultado (`demo`)
 
-| Métrica | Antes (`tests/broken_page.html`) | Depois (`reports/fixed_page.html`) |
+| Métrica | Antes (`broken_page.html`) | Depois (`fixed_page.html`) |
 | :--- | :---: | :---: |
-| **Score de Acessibilidade** | `0 / 100` (Crítico) | **`100 / 100`** |
-| **1. Contraste e Visibilidade** | 3 falhas graves (`1.68:1` a `2.12:1`) | **0 falhas (`> 11.0:1` AAA)** |
-| **2. Elementos Interativos Mudos** | 5 controles sem nome acessível | **0 falhas (`aria-label` + `<label>`)** |
-| **3. Semântica de Mídia** | 5 mídias sem `alt` ou com `alt` genérico | **0 falhas (`alt` contextual)** |
-| **4. Ordem de Foco e Teclado** | 6 falhas (`tabindex > 0`, `outline: none`, trap) | **0 falhas (`:focus-visible` + livre)** |
-| **Status WCAG 2.2 Nível AA** | ❌ Não Conforme | ✅ **100% Conforme** |
+| **Score de Acessibilidade** | `0 / 100` | **`100 / 100`** |
+| Contraste e Visibilidade | 3 falhas | **0 falhas** |
+| Elementos Interativos Mudos | 5 falhas | **0 falhas** |
+| Semântica de Mídia | 5 falhas | **0 falhas** |
+| Ordem de Foco e Teclado | 6 falhas | **0 falhas** |
+| **Status WCAG 2.2 AA** | ❌ Não Conforme | ✅ **Conforme** |
+
+Saídas geradas em `reports/`: `audit_report.md`, `audit_results.json`, `fixed_page.html` e `latest_screenshot.png`.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 📁 Estrutura do projeto
+
+```text
+Kiro-A11y-Agent/
+├── .kiro/specs/kiro-a11y-agent/  # Especificações Kiro (Spec-Driven Development)
+├── core/
+│   ├── scanner.py                # Async Playwright + Screenshot + Accessibility Tree + JS DOM Filter
+│   ├── analyzer.py               # Cliente OpenAI SDK + Motor Smart Mock/Fallback
+│   └── fixer.py                  # Diffs Antes/Depois, Auto-Fixer DOM e Relatório Markdown
+├── cli/
+│   └── main.py                   # CLI interativa (Typer + Rich): scan, fix, demo
+├── tests/
+│   └── broken_page.html          # Mini e-commerce com falhas intencionais nos 4 pilares
+├── docs/
+│   ├── USAGE.md                  # Guia detalhado de uso
+│   ├── CONFIGURATION.md          # Configuração de provedores de IA
+│   └── TROUBLESHOOTING.md        # Erros comuns e soluções
+├── reports/                      # Saídas geradas (ignoradas pelo Git)
+├── requirements.md               # Requisitos (EARS + WCAG 2.2)
+├── design.md                     # Arquitetura técnica
+├── tasks.md                      # Checklist de implementação
+├── .env.example                  # Template de configuração de IA
+├── requirements.txt              # Dependências Python
+├── CONTRIBUTING.md               # Como contribuir
+├── CHANGELOG.md                  # Histórico de versões
+├── LICENSE                       # MIT
+└── README.md
+```
+
+---
+
+## 🔧 Solução de problemas
+
+| Sintoma | Solução |
+| :--- | :--- |
+| `playwright: command not found` | Ative o venv e rode `pip install -r requirements.txt`. |
+| Erro ao iniciar o Chromium | Rode `playwright install chromium` ou garanta Chrome/Edge instalados. |
+| Caracteres estranhos no terminal (Windows) | É só a renderização de caixas do Rich; não afeta o resultado. Use Windows Terminal para melhor exibição. |
+| `ModuleNotFoundError` | Confirme que o venv está ativo antes de rodar os comandos. |
+
+Mais detalhes em [`docs/TROUBLESHOOTING.md`](./docs/TROUBLESHOOTING.md).
+
+---
+
+## ❓ FAQ
+
+**Preciso de uma chave de API para testar?**
+Não. Sem chave, o Smart Mock/Fallback processa os dados reais do navegador e gera correções completas.
+
+**Funciona offline?**
+Sim, no modo mock e em arquivos HTML locais. URLs remotas exigem internet para carregar a página.
+
+**Suporta frameworks (React/Vue/Angular)?**
+O scan funciona sobre o DOM renderizado, então captura o resultado final. A aplicação automática de patches (`fix`) é otimizada para arquivos HTML; para JSX, use os diffs do relatório como guia.
+
+**É um substituto para auditoria manual?**
+Não. A conformidade total com a WCAG exige testes com tecnologias assistivas e revisão de especialistas. A ferramenta acelera e automatiza a maior parte do trabalho, mas o julgamento humano continua necessário.
+
+---
+
+## 🛠️ Tecnologias
+
 - **Python 3.10+**
-- **Playwright (Async API)** — Renderização real, cálculo CSS computado, Screenshot Full-Page e Accessibility Tree (`page.accessibility.snapshot()` / CDP `Accessibility.getFullAXTree`).
-- **OpenAI Python SDK** — Compatível com OpenRouter, OpenAI, Anthropic, Grok, Gemini e Ollama via `AI_BASE_URL`.
-- **BeautifulSoup4** — Manipulação cirúrgica do DOM para aplicação de patches HTML/CSS.
-- **Typer & Rich** — Interface de linha de comando moderna com tabelas coloridas, spinners e syntax highlighting.
+- **Playwright (Async API)** — renderização real, CSS computado, screenshot full-page e Accessibility Tree.
+- **OpenAI Python SDK** — compatível com OpenRouter, OpenAI, Grok, Gemini e Ollama via `AI_BASE_URL`.
+- **BeautifulSoup4** — manipulação cirúrgica do DOM.
+- **Typer & Rich** — CLI moderna com tabelas, spinners e syntax highlighting.
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Leia o [`CONTRIBUTING.md`](./CONTRIBUTING.md) para o fluxo de trabalho, padrões de código e como abrir issues e pull requests.
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença **MIT**. Veja [`LICENSE`](./LICENSE) para os termos completos.
 
 ---
 
