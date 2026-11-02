@@ -1,7 +1,7 @@
 # Requirements Specification — Kiro A11y Agent
 
 **Projeto:** Kiro A11y Agent (Autonomous Web Accessibility Auditor & Auto-Fixer)  
-**Autor:** kirodev  
+**Autor:** devrisoles  
 **Hackathon:** Kiroween  
 **Padrão de Referência:** W3C WCAG 2.1 / 2.2 (Níveis A e AA)  
 **Versão:** 1.0.0

@@ -9,7 +9,7 @@ Responsável por:
 4. Injetar JavaScript cirúrgico no DOM para filtrar e retornar apenas os elementos violadores ou suspeitos
    nos 4 pilares da WCAG 2.1/2.2 (economizando tokens da LLM).
 
-Desenvolvido por kirodev.
+Desenvolvido por devrisoles.
 """
 
 from __future__ import annotations

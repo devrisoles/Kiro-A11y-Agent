@@ -1,7 +1,7 @@
 # System Design & Architecture — Kiro A11y Agent
 
 **Projeto:** Kiro A11y Agent  
-**Autor:** kirodev  
+**Autor:** devrisoles  
 **Hackathon:** Kiroween  
 **Arquitetura:** Pipeline Assíncrono Modular (Scanner -> Multimodal AI Analyzer -> Surgical Auto-Fixer -> Rich CLI)
 

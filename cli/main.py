@@ -7,7 +7,7 @@ Comandos disponíveis:
 - `demo`: Fluxo completo de demonstração para o Hackathon Kiroween usando `tests/broken_page.html`
           com auto-correção e revalidação de score 100/100.
 
-Desenvolvido por kirodev.
+Desenvolvido por devrisoles.
 """
 
 from __future__ import annotations

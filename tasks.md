@@ -1,7 +1,7 @@
 # Implementation Task List — Kiro A11y Agent
 
 **Projeto:** Kiro A11y Agent  
-**Autor:** kirodev  
+**Autor:** devrisoles  
 **Hackathon:** Kiroween  
 **Status Geral:** Em Execução / Completo
 

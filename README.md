@@ -14,7 +14,7 @@
 
 O **Kiro A11y Agent** é um agente autônomo de ciclo fechado que abre uma página em um navegador real, extrai a *Accessibility Tree* e os estilos computados, analisa o screenshot de forma multimodal e **gera + aplica automaticamente** patches de código (HTML/CSS/JSX), revalidando a página até atingir conformidade.
 
-> **Submissão Oficial para o Hackathon Kiroween** · **Desenvolvido por kirodev**
+> **Submissão Oficial para o Hackathon Kiroween** · **Desenvolvido por devrisoles**
 
 ---
 
@@ -265,4 +265,4 @@ Distribuído sob a licença **MIT**. Veja [`LICENSE`](./LICENSE) para os termos 
 
 ## 👤 Autoria
 
-Projeto **desenvolvido por kirodev**.
+Projeto **desenvolvido por devrisoles**.

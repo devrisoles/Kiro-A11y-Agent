@@ -1,5 +1,5 @@
 """
 Kiro A11y Agent — CLI Package (Typer + Rich)
 
-Desenvolvido por kirodev.
+Desenvolvido por devrisoles.
 """

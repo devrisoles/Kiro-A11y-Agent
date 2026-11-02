@@ -7,7 +7,7 @@ Responsável por:
    atuando nos 4 pilares: Contraste, Elementos Mudos, Semântica de Mídia e Navegação por Teclado.
 3. Gerar o relatório completo em Markdown (`reports/audit_report.md`) com o "Antes e Depois" do código.
 
-Desenvolvido por kirodev.
+Desenvolvido por devrisoles.
 """
 
 from __future__ import annotations

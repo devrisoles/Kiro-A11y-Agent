@@ -10,7 +10,7 @@ Responsável por:
    execute a ferramenta sem chave de API configurada, sintetizando diagnósticos e patches reais
    a partir do DOM e da Accessibility Tree coletados pelo Playwright.
 
-Desenvolvido por kirodev.
+Desenvolvido por devrisoles.
 """
 
 from __future__ import annotations
